@@ -179,7 +179,16 @@ class ServerService : Service() {
             }
         } else session.pid = 0
 
-        serverUtility.executeStartCommand(session)
+        try {
+            serverUtility.executeStartCommand(session)
+        }
+        catch (e: IllegalStateException) {
+            // TODO Send an intent to the MainActivity, message contains problem
+            // val dialogIntent = Intent(this, MyActivity::class.java)
+            // dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // dialogIntent.putExtra("startBootFailed", true)
+            // startActivity(dialogIntent)
+        }
 
         session.active = true
         updateSession(session)

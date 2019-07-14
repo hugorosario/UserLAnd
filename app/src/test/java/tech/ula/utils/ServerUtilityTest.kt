@@ -277,4 +277,61 @@ class ServerUtilityTest {
         assertFalse(result)
         verify(mockLogUtility).logRuntimeErrorForCommand("isServerRunning", command, reason)
     }
+
+    @Test
+    fun `Calling executeStartCommand on a session without a start command returns early without interecting with busybox`() {
+        val session = Session(0, filesystemId = filesystemId)
+        val result = serverUtility.executeStartCommand(session)
+        assertTrue(result is Unit)
+        verifyZeroInteractions(mockBusyboxExecutor)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Calling executeStartCommand on a session without a start script throws exception`() {
+        val session = Session(0, filesystemId = filesystemId)
+        session.startCommand = "ls -lah"
+
+        val folder = tempFolder.newFolder(filesystemDirName, "support")
+        val profileScriptFile = File("${folder.absolutePath}/userland_profile.sh")
+        profileScriptFile.createNewFile()
+
+        serverUtility.executeStartCommand(session)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Calling executeStartCommand on a session without a profile script throws exception`() {
+        val session = Session(0, filesystemId = filesystemId)
+        session.startCommand = "ls -lah"
+
+        val folder = tempFolder.newFolder(filesystemDirName, "support")
+        val startScriptFile = File("${folder.absolutePath}/autostart.sh")
+        startScriptFile.createNewFile()
+
+        serverUtility.executeStartCommand(session)
+    }
+
+    @Test
+    fun `Calling executeStartCommand on a session with command and files calls busybox executor`() {
+        val session = Session(0, filesystemId = filesystemId)
+        session.startCommand = "ls -lah"
+
+        val folder = tempFolder.newFolder(filesystemDirName, "support")
+        val startScriptFile = File("${folder.absolutePath}/autostart.sh")
+        val profileScriptFile = File("${folder.absolutePath}/userland_profile.sh")
+        startScriptFile.createNewFile()
+        profileScriptFile.createNewFile()
+
+        serverUtility.executeStartCommand(session)
+
+        val expectedCommand = "/support/autostart.sh"
+        val expectedCommandShouldTerminate = false
+            verify(mockBusyboxExecutor).executeProotCommand(
+                    eq(expectedCommand),
+                    eq(filesystemDirName),
+                    eq(expectedCommandShouldTerminate),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull()
+            )
+    }
 }
