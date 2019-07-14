@@ -67,8 +67,8 @@ class ServerUtility(
         val startScript = File(applicationFilesDirPath, "$filesystemDirName/support/autostart.sh")
         val profileScript = File(applicationFilesDirPath, "$filesystemDirName/support/userland_profile.sh")
 
-        if (!startScript.exists()) throw IllegalStateException("Start script does not exist.")
-        if (!profileScript.exists()) throw IllegalStateException("Profile script does not exist.")
+        if (!startScript.exists()) throw IllegalStateException("Failed to execute Start Command: Start script does not exist.")
+        if (!profileScript.exists()) throw IllegalStateException("Failed to execute Start Command: Profile script does not exist.")
 
         profileScript.copyTo(startScript, overwrite = true)
         startScript.appendText("\n${session.startCommand}")

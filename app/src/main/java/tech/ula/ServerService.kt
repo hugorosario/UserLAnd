@@ -182,11 +182,10 @@ class ServerService : Service() {
         try {
             serverUtility.executeStartCommand(session)
         } catch (e: IllegalStateException) {
-            // TODO Send an intent to the MainActivity, message contains problem
-            // val dialogIntent = Intent(this, MyActivity::class.java)
-            // dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            // dialogIntent.putExtra("startBootFailed", true)
-            // startActivity(dialogIntent)
+            val intent = Intent(SERVER_SERVICE_RESULT)
+                    .putExtra("type", "startCommandFailed")
+                    .putExtra("error", e.message)
+            broadcaster.sendBroadcast(intent)
         }
 
         session.active = true
