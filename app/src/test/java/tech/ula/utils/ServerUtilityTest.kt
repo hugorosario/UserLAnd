@@ -310,6 +310,38 @@ class ServerUtilityTest {
         serverUtility.executeStartCommand(session)
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun `Calling executeStartCommand on a session without a start script fails with no interactions with busyboxExecutor`() {
+        val session = Session(0, filesystemId = filesystemId)
+        session.startCommand = "ls -lah"
+
+        val folder = tempFolder.newFolder(filesystemDirName, "support")
+        val profileScriptFile = File("${folder.absolutePath}/userland_profile.sh")
+        profileScriptFile.createNewFile()
+
+        try {
+            serverUtility.executeStartCommand(session)
+        } finally {
+            verifyZeroInteractions(mockBusyboxExecutor)
+        }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Calling executeStartCommand on a session without a profile script fails with no interactions with busyboxExecutor`() {
+        val session = Session(0, filesystemId = filesystemId)
+        session.startCommand = "ls -lah"
+
+        val folder = tempFolder.newFolder(filesystemDirName, "support")
+        val startScriptFile = File("${folder.absolutePath}/autostart.sh")
+        startScriptFile.createNewFile()
+
+        try {
+            serverUtility.executeStartCommand(session)
+        } finally {
+            verifyZeroInteractions(mockBusyboxExecutor)
+        }
+    }
+
     @Test
     fun `Calling executeStartCommand on a session with command and files calls busybox executor`() {
         val session = Session(0, filesystemId = filesystemId)

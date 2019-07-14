@@ -181,8 +181,7 @@ class ServerService : Service() {
 
         try {
             serverUtility.executeStartCommand(session)
-        }
-        catch (e: IllegalStateException) {
+        } catch (e: IllegalStateException) {
             // TODO Send an intent to the MainActivity, message contains problem
             // val dialogIntent = Intent(this, MyActivity::class.java)
             // dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
