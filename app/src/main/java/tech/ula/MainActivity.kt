@@ -97,6 +97,10 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                         val type = intent.getStringExtra("dialogType") ?: ""
                         showDialog(type)
                     }
+                    "startCommandFailed" -> {
+                        val errorMessage = intent.getStringExtra("error") ?: ""
+                        showDialog(errorMessage)
+                    }
                 }
             }
         }
@@ -425,9 +429,18 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
                 displayGenericErrorDialog(this, R.string.general_error_title,
                         R.string.illegal_state_unhandled_session_service_type)
             }
-            "playStoreMissingForClient" ->
+            "playStoreMissingForClient" -> {
                 displayGenericErrorDialog(this, R.string.alert_need_client_app_title,
-                    R.string.alert_need_client_app_message)
+                        R.string.alert_need_client_app_message)
+            }
+            "Failed to execute Start Command: Start script does not exist." -> {
+                displayGenericErrorDialog(this, R.string.alert_need_start_script_title,
+                        R.string.alert_need_start_script_message)
+            }
+            "Failed to execute Start Command: Profile script does not exist." -> {
+                displayGenericErrorDialog(this, R.string.alert_need_profile_script_title,
+                        R.string.alert_need_profile_script_message)
+            }
         }
     }
 

@@ -58,12 +58,18 @@ class ServerUtility(
      * Execute the user-defined startCommand
      * Creates a new script based on userland_profile.sh and adds the user-defined command to the script
      */
+    // TODO Refactor function. Move function to BusyboxExecutor. This function is not explicitly related to servers
     fun executeStartCommand(session: Session) {
         if (session.startCommand.isEmpty())
             return
+
         val filesystemDirName = session.filesystemId.toString()
         val startScript = File(applicationFilesDirPath, "$filesystemDirName/support/autostart.sh")
         val profileScript = File(applicationFilesDirPath, "$filesystemDirName/support/userland_profile.sh")
+
+        if (!startScript.exists()) throw IllegalStateException("Failed to execute Start Command: Start script does not exist.")
+        if (!profileScript.exists()) throw IllegalStateException("Failed to execute Start Command: Profile script does not exist.")
+
         profileScript.copyTo(startScript, overwrite = true)
         startScript.appendText("\n${session.startCommand}")
         startScript.setExecutable(true, false)

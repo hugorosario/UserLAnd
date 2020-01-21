@@ -179,7 +179,14 @@ class ServerService : Service() {
             }
         } else session.pid = 0
 
-        serverUtility.executeStartCommand(session)
+        try {
+            serverUtility.executeStartCommand(session)
+        } catch (e: IllegalStateException) {
+            val intent = Intent(SERVER_SERVICE_RESULT)
+                    .putExtra("type", "startCommandFailed")
+                    .putExtra("error", e.message)
+            broadcaster.sendBroadcast(intent)
+        }
 
         session.active = true
         updateSession(session)
